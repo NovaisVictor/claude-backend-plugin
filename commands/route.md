@@ -1,4 +1,6 @@
-Gerar rota Elysia e atualizar barrel de rotas do domínio.
+---
+description: Gerar rota Elysia e atualizar barrel de rotas do domínio.
+---
 
 Formato de $ARGUMENTS: `{METHOD} /{path} {use-case-kebab-name}`
 Exemplos: `POST /products create-product`, `GET /products/:id get-product-by-id`
@@ -60,6 +62,7 @@ export const {actionVariable} = new Elysia().{method}(
 `src/http/controllers/{domain}/routes.ts`:
 
 Se não existir, criar:
+
 ```typescript
 import Elysia from 'elysia'
 import { {actionVariable} } from './{use-case-kebab}'
@@ -73,6 +76,7 @@ Se já existir, adicionar import e `.use()`.
 ## Próximos passos
 
 Informar ao usuário:
+
 1. Preencher Zod schemas de body, params e response
 2. Mapear input para o `execute()` do use case
 3. Ajustar error handling para os domain errors

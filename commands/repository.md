@@ -1,4 +1,6 @@
-Gerar a camada de repositório para a entidade em $ARGUMENTS (PascalCase singular, e.g. `Product`).
+---
+description: Gerar a camada de repositório para a entidade em $ARGUMENTS (PascalCase singular, e.g. `Product`).
+---
 
 Cria 3 arquivos: interface, implementação Drizzle, implementação in-memory.
 
@@ -89,5 +91,6 @@ export class InMemory{Entity}sRepository implements {Entity}sRepository {
 ## Próximos passos
 
 Informar ao usuário:
+
 1. Adicionar métodos específicos do domínio na interface e implementar nos dois repos
 2. `/use-case {Action}{Entity}` para gerar um use case

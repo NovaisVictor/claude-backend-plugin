@@ -1,4 +1,6 @@
-Gerar use case completo para o nome em $ARGUMENTS (PascalCase, e.g. `CreateProduct`).
+---
+description: Gerar use case completo para o nome em $ARGUMENTS (PascalCase, e.g. `CreateProduct`).
+---
 
 Cria 4 arquivos: use case, factory, domain error, unit test.
 
@@ -118,6 +120,7 @@ describe('{Argument} Use Case', () => {
 ## Próximos passos
 
 Informar ao usuário:
+
 1. Implementar lógica de negócio no use case
 2. Preencher campos do request schema
 3. Completar cenários de teste

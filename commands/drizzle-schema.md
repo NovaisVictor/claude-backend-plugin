@@ -1,4 +1,6 @@
-Gerar schema Drizzle para a entidade em $ARGUMENTS (PascalCase singular, e.g. `Product`).
+---
+description: Gerar schema Drizzle para a entidade em $ARGUMENTS (PascalCase singular, e.g. `Product`).
+---
 
 ## Nomes derivados
 
@@ -42,12 +44,14 @@ export const {entities}Relations = relations({entities}, ({ one, many }) => ({
 ## Atualizar barrel
 
 Em `src/database/schema/index.ts`:
+
 - Adicionar import de `{entities}` e `{entities}Relations`
 - Adicionar ao objeto `schema` nas seções Tables e Relations
 
 ## Próximos passos
 
 Informar ao usuário:
+
 1. Adicionar colunas e relações ao schema
 2. `bun run db:generate`
 3. `bun run db:migrate`

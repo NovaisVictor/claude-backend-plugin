@@ -1,4 +1,6 @@
-Gerar unit test para um use case existente. Nome do use case em $ARGUMENTS (PascalCase, e.g. `CreateProduct`).
+---
+description: Gerar unit test para um use case existente. Nome do use case em $ARGUMENTS (PascalCase, e.g. `CreateProduct`).
+---
 
 ## Nomes derivados
 

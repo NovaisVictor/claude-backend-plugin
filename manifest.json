@@ -1,8 +1,0 @@
-{
-  "name": "backend-bun-elysia-drizzle",
-  "version": "1.0.0",
-  "description": "Plugin para projetos backend com Bun + Elysia + Drizzle + Clean Architecture + SOLID. Inclui skills de arquitetura, commands de scaffolding e agents de review.",
-  "skills": "skills",
-  "commands": "commands",
-  "agents": "agents"
-}

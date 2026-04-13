@@ -1,4 +1,6 @@
-Gerar teste E2E para uma rota Elysia existente. Argumentos em $ARGUMENTS: `{METHOD} /{path}`.
+---
+description: Gerar teste E2E para uma rota Elysia existente. Argumentos em $ARGUMENTS: `{METHOD} /{path}`.
+---
 
 Exemplos: `POST /products`, `GET /products/:id`, `DELETE /orders/:id`
 
@@ -19,36 +21,36 @@ Exemplos: `POST /products`, `GET /products/:id`, `DELETE /orders/:id`
 `src/http/controllers/{domain}/{action}.spec.ts`:
 
 ```typescript
-import { describe, it, expect } from 'vitest'
-import { app } from '@/index'
+import { describe, it, expect } from "vitest";
+import { app } from "@/index";
 
-describe('{Action} (e2e)', () => {
-  it('should be able to {success scenario}', async () => {
+describe("{Action} (e2e)", () => {
+  it("should be able to {success scenario}", async () => {
     const response = await app.handle(
-      new Request('http://localhost{path}', {
-        method: '{METHOD}',
-        headers: { 'Content-Type': 'application/json' },
+      new Request("http://localhost{path}", {
+        method: "{METHOD}",
+        headers: { "Content-Type": "application/json" },
         // body: JSON.stringify({ TODO }),
       }),
-    )
+    );
 
-    expect(response.status).toBe({expectedStatus})
-  })
+    expect(response.status).toBe({ expectedStatus });
+  });
 
-  it('should return 400 when body is invalid', async () => {
+  it("should return 400 when body is invalid", async () => {
     const response = await app.handle(
-      new Request('http://localhost{path}', {
-        method: '{METHOD}',
-        headers: { 'Content-Type': 'application/json' },
+      new Request("http://localhost{path}", {
+        method: "{METHOD}",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({}),
       }),
-    )
+    );
 
-    expect(response.status).toBe(400)
-  })
+    expect(response.status).toBe(400);
+  });
 
   // Um teste por domain error mapeado na rota
-})
+});
 ```
 
 ## Status esperados
@@ -63,6 +65,7 @@ Para paths com parâmetros (`:id`), substituir por ID real (do seed ou hardcoded
 ## Próximos passos
 
 Informar ao usuário:
+
 1. Preencher request body conforme Zod schema da rota
 2. Adicionar assertions no response body
 3. Adicionar `beforeAll` se necessário para seed de dados

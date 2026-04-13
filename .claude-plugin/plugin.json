@@ -1,0 +1,11 @@
+{
+  "name": "claude-backend-plugin",
+  "version": "1.0.0",
+  "description": "Plugin para projetos backend com Bun + Elysia + Drizzle + Clean Architecture + SOLID.",
+  "author": {
+    "name": "Victor Novais"
+  },
+  "skills": "./skills",
+  "commands": "./commands",
+  "agents": ["./agents/reviewer.md", "./agents/scaffolder.md"]
+}
