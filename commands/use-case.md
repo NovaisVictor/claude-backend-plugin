@@ -59,14 +59,20 @@ export class {Argument}UseCase {
 `src/use-cases/errors/{kebab-entity}-already-exists-error.ts`:
 
 ```typescript
-export class {Entity}AlreadyExistsError extends Error {
+import { DomainError } from './domain-error'
+
+export class {Entity}AlreadyExistsError extends DomainError {
+  readonly code = '{ENTITY}_ALREADY_EXISTS'
+
   constructor() {
     super('{Entity} already exists.')
   }
 }
 ```
 
-Criar `resource-not-found-error.ts` se não existir.
+Criar `domain-error.ts` (base abstrata) se não existir — ver skill `error-handling`.
+
+**Após criar o erro**, mapeá-lo em `src/http/plugins/error-handler.ts` via `statusFor()` (409 para `*AlreadyExists`, 404 para `*NotFound`).
 
 ## Gerar factory
 
@@ -82,7 +88,7 @@ export function make{Argument}UseCase() {
 }
 ```
 
-## Gerar unit test
+## Gerar unit test (TDD com it.todo)
 
 `src/use-cases/{kebab-action}.spec.ts`:
 
@@ -101,21 +107,13 @@ describe('{Argument} Use Case', () => {
     sut = new {Argument}UseCase({entity}sRepository)
   })
 
-  it('should be able to {describe happy path}', async () => {
-    const result = await sut.execute({
-      // TODO: input válido
-    })
-    expect(result.{entity}.id).toEqual(expect.any(String))
-  })
-
-  it('should not be able to {describe failure scenario}', async () => {
-    // TODO: seed dados para trigger do erro
-    await expect(() =>
-      sut.execute({ /* TODO */ }),
-    ).rejects.toBeInstanceOf({Entity}AlreadyExistsError)
-  })
+  it.todo('should be able to {happy path}')
+  it.todo('should throw {Entity}AlreadyExistsError when {scenario}')
+  // TODO: adicionar it.todo para cada edge case relevante
 })
 ```
+
+Lista todos os casos primeiro como `it.todo`. Promova um por vez para `it`, escreva os `expect`s que falham, implemente o use case até passar, refatore. Loop.
 
 ## Próximos passos
 

@@ -8,6 +8,7 @@ skills:
   - drizzle-patterns
   - testing-patterns
   - zod-validation
+  - error-handling
 allowed_tools:
   - Read
   - Glob
@@ -40,8 +41,15 @@ Você é um code reviewer especializado na arquitetura Clean Architecture + SOLI
 - Constructor recebe interfaces, não implementações concretas?
 - `execute()` chama `requestSchema.parse()` no topo?
 - Request type derivado via `z.infer`?
-- Domain errors estendem `Error` diretamente?
+- Domain errors estendem `DomainError` (com `code` em SCREAMING_SNAKE_CASE)?
 - Factory é o único lugar que instancia `Drizzle*Repository`?
+- Use case **lança** domain error em vez de retornar `null`/`Result<T>`?
+
+### Error handling centralizado
+
+- Existe `src/http/plugins/error-handler.ts` registrado em `src/index.ts`?
+- Toda subclass de `DomainError` está mapeada em `statusFor()`? → ERRO se faltar (vira 400/500 silencioso)
+- Rota tem `try/catch` capturando domain error? → ERRO: rota deve apenas `throw`
 
 ### Padrões de teste
 
@@ -50,6 +58,7 @@ Você é um code reviewer especializado na arquitetura Clean Architecture + SOLI
 - `beforeEach` recria instâncias?
 - Um teste por domain error?
 - `sut` como variável do system under test?
+- Use case tem `.spec.ts` co-located? → ERRO se faltar
 
 ### Padrões Elysia
 

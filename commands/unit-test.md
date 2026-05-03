@@ -35,18 +35,12 @@ describe('{UseCaseName} Use Case', () => {
     sut = new {UseCaseName}UseCase({entity}sRepository)
   })
 
-  it('should be able to {happy path}', async () => {
-    const result = await sut.execute({ /* TODO */ })
-    expect(result.{entity}.id).toEqual(expect.any(String))
-  })
-
-  // Um teste por domain error:
-  it('should not be able to {scenario que causa o erro}', async () => {
-    await expect(() =>
-      sut.execute({ /* TODO */ }),
-    ).rejects.toBeInstanceOf({DomainError})
-  })
+  it.todo('should be able to {happy path}')
+  it.todo('should throw {DomainError} when {scenario}')
+  // TODO: adicionar it.todo para cada edge case relevante
 })
 ```
+
+Liste todos os casos primeiro como `it.todo`. Workflow TDD: promove um → escreve `expect`s falhando → implementa o mínimo no use case até passar → refatora → loop. Ver skill `testing-patterns`.
 
 Se o arquivo já existir, avisar antes de sobrescrever.

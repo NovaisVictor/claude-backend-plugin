@@ -4,6 +4,31 @@ description: "Convenções de testes: unit tests com in-memory repos, e2e tests 
 
 # Testes — Convenções
 
+## TDD workflow
+
+Test-first com etapas explícitas:
+
+1. **Listar casos** como `it.todo('should X')` cobrindo: happy path, cada domain error, edge cases.
+2. **Promover** 1 `it.todo` → `it` com `expect`s que falham.
+3. **Rodar** `bun run test {arquivo}` e ver vermelho.
+4. **Implementar o mínimo** no use case para passar.
+5. **Refactor** quando verde. Loop até cobrir os `it.todo`s restantes.
+
+```typescript
+describe('CreateProductUseCase', () => {
+  beforeEach(() => {
+    productsRepository = new InMemoryProductsRepository()
+    sut = new CreateProductUseCase(productsRepository)
+  })
+
+  it.todo('should create a product with valid input')
+  it.todo('should throw ProductAlreadyExistsError when name conflicts')
+  it.todo('should normalize name to lowercase before persisting')
+})
+```
+
+Promova um por vez, escreva os `expect`s que falham, implemente, refatore.
+
 ## Unit tests (use cases)
 
 Localização: `src/use-cases/{action}.spec.ts`
@@ -48,7 +73,8 @@ describe('CreateProductUseCase', () => {
 - `sut` é obrigatório como nome da variável do system under test
 - `let` no escopo do módulo para repos e sut
 - `beforeEach` sempre cria instâncias novas
-- Um teste happy path + um teste por domain error
+- Um teste happy path + um teste por domain error + edge cases relevantes
+- **Co-located**: `.spec.ts` ao lado do `.ts` do use case
 - Apenas in-memory repos — nunca `Drizzle*Repository` ou `db`
 - Se usa lógica de tempo: `vi.useFakeTimers()` no `beforeEach`, `vi.useRealTimers()` no `afterEach`
 - Imports com `@/`

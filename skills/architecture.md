@@ -16,9 +16,11 @@ HTTP (Elysia) → Factory (wiring) → Use Case (domínio) → Repository (inter
 
 - **S** — Uma classe, uma responsabilidade. `CreateProductUseCase` só cria produtos.
 - **O** — Novo comportamento = nova classe. Novo backend de repositório implementa a interface existente.
-- **L** — `InMemory*Repository` e `Drizzle*Repository` são intercambiáveis.
+- **L** — `InMemory*Repository` e `Drizzle*Repository` (e quaisquer outras data sources como API externa, cache, DWH) são intercambiáveis.
 - **I** — Cada entidade tem sua interface de repository com apenas os métodos necessários.
 - **D** — Use cases declaram dependências como interfaces no construtor. Factory injeta a implementação.
+
+**Multi data source:** quando uma entidade vive em mais de uma fonte (Drizzle + DWH, por exemplo), criar uma implementação por fonte (`Drizzle{Entity}sRepository`, `Dwh{Entity}sRepository`). A interface é a mesma; o use case escolhe via factory ou injeção.
 
 ## Estrutura de pastas
 
@@ -38,6 +40,7 @@ src/
       drizzle-{entities}-repository.ts      # Implementação Drizzle
     in-memory/
       in-memory-{entities}-repository.ts    # Test double
+    # outras data sources conforme necessário (api externa, cache, dwh)
   use-cases/
     {action}.ts                             # Classe do use case
     {action}.spec.ts                        # Unit test
@@ -84,6 +87,7 @@ src/index.ts → {domain}Routes
 | Interface repository | `{Entity}sRepository` | `ProductsRepository` |
 | Drizzle impl | `Drizzle{Entity}sRepository` | `DrizzleProductsRepository` |
 | In-memory impl | `InMemory{Entity}sRepository` | `InMemoryProductsRepository` |
+| Outros data sources | `{Source}{Entity}sRepository` | `DwhGamesCatalogRepository` |
 | Factory | `make{PascalCase}UseCase` | `makeCreateProductUseCase` |
 | Request schema | `{camelCase}RequestSchema` | `createProductRequestSchema` |
 | Route export | `{camelCase}Route` | `createProductRoute` |

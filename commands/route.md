@@ -27,25 +27,17 @@ Exemplos: `POST /products create-product`, `GET /products/:id get-product-by-id`
 import Elysia from 'elysia'
 import z from 'zod'
 import { make{UseCasePascal}UseCase } from '@/use-cases/factories/make-{use-case-kebab}-use-case'
-import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 
 export const {actionVariable} = new Elysia().{method}(
   '{path}',
   async ({ body, params, status }) => {
     const useCase = make{UseCasePascal}UseCase()
 
-    try {
-      const result = await useCase.execute({
-        // TODO: mapear input validado
-      })
+    const result = await useCase.execute({
+      // TODO: mapear input validado
+    })
 
-      // TODO: status e response adequados
-    } catch (err) {
-      if (err instanceof ResourceNotFoundError) {
-        return status(404, { message: err.message })
-      }
-      throw err
-    }
+    // TODO: status e response adequados
   },
   {
     detail: {
@@ -56,6 +48,8 @@ export const {actionVariable} = new Elysia().{method}(
   },
 )
 ```
+
+**Não capturar domain errors aqui.** O `errorHandlerPlugin` central mapeia (ver skill `error-handling`). Garanta que os erros lançados pelo use case estão registrados em `src/http/plugins/error-handler.ts`.
 
 ## Criar/atualizar routes barrel
 
@@ -79,6 +73,6 @@ Informar ao usuário:
 
 1. Preencher Zod schemas de body, params e response
 2. Mapear input para o `execute()` do use case
-3. Ajustar error handling para os domain errors
+3. Verificar se cada `DomainError` lançado está mapeado em `error-handler.ts`
 4. Registrar `{domain}Routes` no app principal se necessário
 5. `/e2e-test {METHOD} /{path}` para gerar teste E2E

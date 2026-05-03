@@ -12,26 +12,18 @@ Cada rota é uma instância `new Elysia()` independente:
 import Elysia from 'elysia'
 import z from 'zod'
 import { makeCreateProductUseCase } from '@/use-cases/factories/make-create-product-use-case'
-import { ProductAlreadyExistsError } from '@/use-cases/errors/product-already-exists-error'
 
 export const createProductRoute = new Elysia().post(
   '/products',
   async ({ body, status }) => {
     const useCase = makeCreateProductUseCase()
 
-    try {
-      const { product } = await useCase.execute({
-        name: body.name,
-        userId: body.userId,
-      })
+    const { product } = await useCase.execute({
+      name: body.name,
+      userId: body.userId,
+    })
 
-      return status(201, { productId: product.id })
-    } catch (err) {
-      if (err instanceof ProductAlreadyExistsError) {
-        return status(409, { message: err.message })
-      }
-      throw err
-    }
+    return status(201, { productId: product.id })
   },
   {
     detail: {
@@ -48,6 +40,8 @@ export const createProductRoute = new Elysia().post(
   },
 )
 ```
+
+Domain errors são tratados pelo `errorHandlerPlugin` central — rotas não usam `try/catch` para esses erros. Ver `error-handling.md`.
 
 ## Routes barrel
 
@@ -66,8 +60,7 @@ export const productsRoutes = new Elysia({ prefix: '/products' })
 - Cada rota exporta um `new Elysia()` (composável, independente, testável)
 - Zod schemas definidos **inline** no objeto de opções da rota, não importados de fora
 - `import z from 'zod'` (default import, Zod v4)
-- Sempre re-throw de erros desconhecidos (`throw err`) — nunca engolir falhas
-- Domain errors capturados individualmente com `instanceof`
+- **Não capturar domain errors em rota** — `errorHandlerPlugin` central mapeia (ver `error-handling.md`)
 - Routes barrel usa `new Elysia({ prefix: '/{domain}' })`
 - Routes registradas em `src/index.ts` via `.use(domainRoutes)`
 - Route handler chama a **factory**, nunca instancia repos diretamente
@@ -75,14 +68,17 @@ export const productsRoutes = new Elysia({ prefix: '/products' })
 
 ## Error → Status code
 
+Mapeamento centralizado em `src/http/plugins/error-handler.ts` via `statusFor()`. Ver `error-handling.md` para detalhes. Tabela resumida:
+
 | Domain Error | Status |
 |---|---|
-| `ResourceNotFoundError` | 404 |
+| `*NotFoundError` | 404 |
 | `*AlreadyExistsError` | 409 |
 | `*InvalidCredentialsError` | 401 |
-| `*UnauthorizedError` | 403 |
+| `*UnauthorizedError` / `*ForbiddenError` | 403 |
+| Constraint genérica | 400 |
 | Zod validation (automático) | 400 |
-| Erro desconhecido (re-thrown) | 500 |
+| Erro desconhecido | 500 |
 
 ## OpenAPI
 
