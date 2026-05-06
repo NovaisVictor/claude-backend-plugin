@@ -12,7 +12,7 @@ Cria 4 arquivos: use case, factory, domain error, unit test.
 - Arquivos:
   - `src/use-cases/{kebab-action}.ts`
   - `src/use-cases/factories/make-{kebab-action}-use-case.ts`
-  - `src/use-cases/errors/{kebab-entity}-already-exists-error.ts`
+  - `src/use-cases/errors/{kebab-entity}-already-exists.error.ts`
   - `src/use-cases/{kebab-action}.spec.ts`
 
 ## Pré-requisito
@@ -56,7 +56,7 @@ export class {Argument}UseCase {
 
 ## Gerar domain error
 
-`src/use-cases/errors/{kebab-entity}-already-exists-error.ts`:
+`src/use-cases/errors/{kebab-entity}-already-exists.error.ts`:
 
 ```typescript
 import { DomainError } from './domain-error'
@@ -96,7 +96,7 @@ export function make{Argument}UseCase() {
 import { describe, it, expect, beforeEach } from 'vitest'
 import { InMemory{Entity}sRepository } from '@/repositories/in-memory/in-memory-{entities}-repository'
 import { {Argument}UseCase } from './{kebab-action}'
-import { {Entity}AlreadyExistsError } from './errors/{kebab-entity}-already-exists-error'
+import { {Entity}AlreadyExistsError } from './errors/{kebab-entity}-already-exists.error'
 
 let {entity}sRepository: InMemory{Entity}sRepository
 let sut: {Argument}UseCase

@@ -12,13 +12,13 @@ Exemplos: `POST /products`, `GET /products/:id`, `DELETE /orders/:id`
 
 ## Pré-requisitos
 
-1. Encontrar o controller em `src/http/controllers/{domain}/` que corresponde ao path e method
+1. Encontrar a rota em `src/http/routes/{entity}/{action}.route.ts` que corresponde ao path e method
 2. Ler para entender: Zod schemas, use case chamado, domain errors mapeados
 3. Encontrar onde o app Elysia é exportado (`src/index.ts` ou `src/app.ts`)
 
 ## Gerar teste
 
-`src/http/controllers/{domain}/{action}.spec.ts`:
+`src/http/routes/{entity}/{action}.route.spec.ts` (co-located com a rota):
 
 ```typescript
 import { describe, it, expect } from "vitest";
@@ -69,4 +69,4 @@ Informar ao usuário:
 1. Preencher request body conforme Zod schema da rota
 2. Adicionar assertions no response body
 3. Adicionar `beforeAll` se necessário para seed de dados
-4. `vitest run src/http/controllers/{domain}/{action}.spec.ts`
+4. `vitest run src/http/routes/{entity}/{action}.route.spec.ts`

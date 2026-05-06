@@ -29,24 +29,25 @@ export abstract class DomainError extends Error {
 
 ## Subclasses por entidade
 
-`src/use-cases/errors/{kebab-entity}-not-found-error.ts`:
+Naming de arquivo: `src/use-cases/errors/{kebab-entity}-{constraint}.error.ts`
 
 ```typescript
+// src/use-cases/errors/product-not-found.error.ts
 import { DomainError } from './domain-error'
 
 export class ProductNotFoundError extends DomainError {
   readonly code = 'PRODUCT_NOT_FOUND'
 
-  constructor() {
-    super('Product not found.')
+  constructor(productId?: string) {
+    super(productId ? `Product ${productId} not found` : 'Product not found')
   }
 }
 ```
 
-Naming:
+Naming de classe:
 - `{Entity}NotFoundError`
 - `{Entity}AlreadyExistsError`
-- `{Entity}{Constraint}Error` para regras específicas (ex: `TagOrganizationMismatchError`, `TagInUseError`)
+- `{Entity}{Constraint}Error` para regras específicas (ex: `TagOrganizationMismatchError`, `TagInUseError`, `ProductInUseError`)
 
 ## errorHandlerPlugin
 
@@ -55,8 +56,8 @@ Localização: `src/http/plugins/error-handler.ts`
 ```typescript
 import Elysia from 'elysia'
 import { DomainError } from '@/use-cases/errors/domain-error'
-import { ProductNotFoundError } from '@/use-cases/errors/product-not-found-error'
-import { ProductAlreadyExistsError } from '@/use-cases/errors/product-already-exists-error'
+import { ProductNotFoundError } from '@/use-cases/errors/product-not-found.error'
+import { ProductAlreadyExistsError } from '@/use-cases/errors/product-already-exists.error'
 
 function statusFor(error: DomainError): number {
   if (error instanceof ProductNotFoundError) return 404
@@ -102,6 +103,11 @@ app.use(errorHandlerPlugin).use(productsRoutes)
 ## Exemplo de rota (sem try/catch)
 
 ```typescript
+// src/http/routes/products/create-product.route.ts
+import Elysia from 'elysia'
+import z from 'zod'
+import { makeCreateProductUseCase } from '@/use-cases/factories/make-create-product-use-case'
+
 export const createProductRoute = new Elysia().post(
   '/products',
   async ({ body, status }) => {

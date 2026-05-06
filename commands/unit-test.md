@@ -24,7 +24,7 @@ description: Gerar unit test para um use case existente. Nome do use case em $AR
 import { describe, it, expect, beforeEach } from 'vitest'
 import { {UseCaseName}UseCase } from './{kebab-action}'
 import { InMemory{Entity}sRepository } from '@/repositories/in-memory/in-memory-{entities}-repository'
-import { {DomainError} } from './errors/{kebab-error}-error'
+import { {DomainError} } from './errors/{kebab-error}.error'
 
 let {entity}sRepository: InMemory{Entity}sRepository
 let sut: {UseCaseName}UseCase

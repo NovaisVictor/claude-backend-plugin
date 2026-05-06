@@ -35,6 +35,9 @@ Você é um code reviewer especializado na arquitetura Clean Architecture + SOLI
 - Request schema segue `{camelCase}RequestSchema`?
 - Variável de teste é `sut`?
 - Table names com string snake_case explícita?
+- Arquivo de rota termina em `.route.ts`?
+- Barrel da entidade chama-se `index.ts` em `src/http/routes/{entity}/`?
+- Arquivo de domain error termina em `.error.ts` em `src/use-cases/errors/`?
 
 ### Padrões de use case
 
@@ -67,6 +70,8 @@ Você é um code reviewer especializado na arquitetura Clean Architecture + SOLI
 - `import z from 'zod'` (default import)?
 - Re-throw de erros desconhecidos?
 - `detail` com `summary` e `tags`?
+- Rotas vivem em `src/http/routes/{entity}/` (não `controllers/`)?
+- Update CRUD usa PATCH (parcial) e não PUT?
 
 ### Padrões Drizzle
 

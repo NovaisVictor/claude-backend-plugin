@@ -10,9 +10,11 @@ Exemplos: `POST /products create-product`, `GET /products/:id get-product-by-id`
 - HTTP method: primeiro token
 - Path: segundo token
 - Use case name: terceiro token (kebab-case)
-- Domain: primeiro segmento do path
+- Entity: primeiro segmento do path (kebab) — pasta em `src/http/routes/{entity}/`
 - Action variable: camelCase do use case + `Route`
 - Factory function: `make` + PascalCase do use case + `UseCase`
+- Arquivo de rota: `{use-case-kebab}.route.ts`
+- Arquivo de E2E: `{use-case-kebab}.route.spec.ts`
 
 ## Pré-requisitos
 
@@ -21,7 +23,7 @@ Exemplos: `POST /products create-product`, `GET /products/:id get-product-by-id`
 
 ## Gerar route handler
 
-`src/http/controllers/{domain}/{use-case-kebab}.ts`:
+`src/http/routes/{entity}/{use-case-kebab}.route.ts`:
 
 ```typescript
 import Elysia from 'elysia'
@@ -42,7 +44,7 @@ export const {actionVariable} = new Elysia().{method}(
   {
     detail: {
       summary: 'TODO: descrição da rota',
-      tags: ['{Domain}'],
+      tags: ['{Entity}s'],
     },
     // TODO: body, params, response schemas
   },
@@ -51,21 +53,23 @@ export const {actionVariable} = new Elysia().{method}(
 
 **Não capturar domain errors aqui.** O `errorHandlerPlugin` central mapeia (ver skill `error-handling`). Garanta que os erros lançados pelo use case estão registrados em `src/http/plugins/error-handler.ts`.
 
-## Criar/atualizar routes barrel
+## Criar/atualizar barrel
 
-`src/http/controllers/{domain}/routes.ts`:
+`src/http/routes/{entity}/index.ts`:
 
 Se não existir, criar:
 
 ```typescript
 import Elysia from 'elysia'
-import { {actionVariable} } from './{use-case-kebab}'
+import { {actionVariable} } from './{use-case-kebab}.route'
 
-export const {domain}Routes = new Elysia({ prefix: '/{domain}' })
+export const {entity}Routes = new Elysia()
   .use({actionVariable})
 ```
 
 Se já existir, adicionar import e `.use()`.
+
+> Convenção: paths completos no route handler (`'/products'`, `'/products/:id'`). O barrel não usa `prefix` — rotas declaram seu próprio path.
 
 ## Próximos passos
 
@@ -75,4 +79,4 @@ Informar ao usuário:
 2. Mapear input para o `execute()` do use case
 3. Verificar se cada `DomainError` lançado está mapeado em `error-handler.ts`
 4. Registrar `{domain}Routes` no app principal se necessário
-5. `/e2e-test {METHOD} /{path}` para gerar teste E2E
+5. `/e2e-test {METHOD} /{path}` para gerar teste E2E (co-located em `{action}.route.spec.ts`)

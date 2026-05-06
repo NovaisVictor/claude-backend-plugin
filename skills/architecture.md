@@ -43,20 +43,22 @@ src/
     # outras data sources conforme necessário (api externa, cache, dwh)
   use-cases/
     {action}.ts                             # Classe do use case
-    {action}.spec.ts                        # Unit test
+    {action}.spec.ts                        # Unit test (co-located)
     errors/
-      resource-not-found-error.ts
-      {entity}-already-exists-error.ts
+      domain-error.ts                       # Base abstrata
+      {entity}-not-found.error.ts           # Subclasses por entidade/regra
+      {entity}-already-exists.error.ts
     factories/
       make-{action}-use-case.ts             # Factory — único ponto de wiring
   http/
-    controllers/
-      {domain}/
-        routes.ts                           # Barrel Elysia com prefix
-        {action}.ts                         # Route handler
-        {action}.spec.ts                    # E2E test
+    routes/
+      {entity}/
+        {action}.route.ts                   # Route handler Elysia
+        {action}.route.spec.ts              # E2E test (co-located)
+        index.ts                            # Barrel Elysia com prefix
     plugins/
-    middlewares/
+      better-auth.ts
+      error-handler.ts                      # Mapping central DomainError → status
 ```
 
 ## Imports proibidos
@@ -66,14 +68,16 @@ src/
 - Use case importando `Elysia` → HTTP não pertence ao domínio
 - Route importando request schema do use case → rotas definem seus próprios Zod schemas
 - Route importando `db` → usar use case
+- Route com `try/catch` de domain error → `errorHandlerPlugin` central mapeia
 - In-memory repo importando `db` ou `drizzle-orm` → deve ser puro
+- `error-handler.ts` sem registrar uma subclass nova de `DomainError` → vira 400/500 silencioso
 
 ## Fluxo de dependência
 
 ```
-src/index.ts → {domain}Routes
-  routes.ts → {action}Route
-    {action}.ts (route) → make{Action}UseCase (factory) + {DomainError}
+src/index.ts → {entity}Routes (barrel)
+  index.ts → {action}Route
+    {action}.route.ts (route) → make{Action}UseCase (factory) + {DomainError}
       factory → Drizzle{Entity}sRepository + {Action}UseCase
         use case → {Entity}sRepository (interface) + z (zod) + {DomainError}
 ```
@@ -82,18 +86,36 @@ src/index.ts → {domain}Routes
 
 | Item | Convenção | Exemplo |
 |------|-----------|---------|
-| Arquivos | kebab-case | `create-product.ts` |
+| Arquivos | kebab-case | `create-product.ts`, `create-product.route.ts` |
 | Classes | PascalCase | `CreateProductUseCase` |
 | Interface repository | `{Entity}sRepository` | `ProductsRepository` |
 | Drizzle impl | `Drizzle{Entity}sRepository` | `DrizzleProductsRepository` |
 | In-memory impl | `InMemory{Entity}sRepository` | `InMemoryProductsRepository` |
 | Outros data sources | `{Source}{Entity}sRepository` | `DwhGamesCatalogRepository` |
 | Factory | `make{PascalCase}UseCase` | `makeCreateProductUseCase` |
+| Domain error subclass | `{Entity}{Constraint}Error` | `ProductNotFoundError`, `ProductAlreadyExistsError` |
+| Domain error file | `{kebab-entity}-{constraint}.error.ts` | `product-not-found.error.ts` |
+| Domain error code | SCREAMING_SNAKE_CASE | `'PRODUCT_NOT_FOUND'` |
 | Request schema | `{camelCase}RequestSchema` | `createProductRequestSchema` |
 | Route export | `{camelCase}Route` | `createProductRoute` |
-| Routes barrel | `{domain}Routes` | `productsRoutes` |
+| Route file | `{kebab-action}.route.ts` | `create-product.route.ts` |
+| Routes barrel | `{entity}Routes` exportado em `index.ts` | `productsRoutes` |
 | SUT (testes) | `sut` | `let sut: CreateProductUseCase` |
 | DB tables | snake_case string | `'product_items'` |
 | DB columns | snake_case string | `'user_id'` |
 | TS properties | camelCase | `userId` |
 | Path alias | `@/*` → `./src/*` | `@/repositories/...` |
+
+## CRUD padrão
+
+Quando o usuário pedir CRUD, gerar estas 5 ações:
+
+| Ação | Use Case | Method | Path | Status |
+|------|----------|--------|------|--------|
+| Create | `Create{Entity}` | POST | `/{entities}` | 201 |
+| List | `List{Entity}s` | GET | `/{entities}` | 200 |
+| Get by ID | `Get{Entity}ById` | GET | `/{entities}/:id` | 200 |
+| Update | `Update{Entity}` | PATCH | `/{entities}/:id` | 200 |
+| Delete | `Delete{Entity}` | DELETE | `/{entities}/:id` | 204 |
+
+Update usa **PATCH com body parcial** (todos os campos opcionais). Para criar de zero é POST.

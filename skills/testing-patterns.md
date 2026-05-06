@@ -31,13 +31,13 @@ Promova um por vez, escreva os `expect`s que falham, implemente, refatore.
 
 ## Unit tests (use cases)
 
-Localização: `src/use-cases/{action}.spec.ts`
+Localização: `src/use-cases/{action}.spec.ts` (co-located).
 
 ```typescript
 import { describe, it, expect, beforeEach } from 'vitest'
 import { InMemoryProductsRepository } from '@/repositories/in-memory/in-memory-products-repository'
 import { CreateProductUseCase } from './create-product'
-import { ProductAlreadyExistsError } from './errors/product-already-exists-error'
+import { ProductAlreadyExistsError } from './errors/product-already-exists.error'
 
 let productsRepository: InMemoryProductsRepository
 let sut: CreateProductUseCase
@@ -78,10 +78,11 @@ describe('CreateProductUseCase', () => {
 - Apenas in-memory repos — nunca `Drizzle*Repository` ou `db`
 - Se usa lógica de tempo: `vi.useFakeTimers()` no `beforeEach`, `vi.useRealTimers()` no `afterEach`
 - Imports com `@/`
+- In-memory repos usam `randomUUID()` de `node:crypto` (Vitest roda em Node — `bun:randomUUIDv7` não está disponível em test). Em produção, Drizzle gera o UUIDv7 via `$defaultFn`.
 
-## E2E tests (controllers)
+## E2E tests (rotas)
 
-Localização: `src/http/controllers/{domain}/{action}.spec.ts`
+Localização: `src/http/routes/{entity}/{action}.route.spec.ts` (co-located com a route).
 
 ```typescript
 import { describe, it, expect } from 'vitest'

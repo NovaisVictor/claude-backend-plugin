@@ -31,7 +31,7 @@ Ao receber uma entidade e ações (e.g. "CRUD de Product" ou "feature Order com 
 
 Para cada ação (create, get, list, update, delete):
 - **Spec primeiro**: criar `src/use-cases/{kebab-action}.spec.ts` com `it.todo`s cobrindo happy path + cada domain error + edge cases relevantes
-- Criar domain errors estendendo `DomainError` em `src/use-cases/errors/` (ver skill `error-handling`)
+- Criar domain errors estendendo `DomainError` em `src/use-cases/errors/{kebab-entity}-{constraint}.error.ts` (ver skill `error-handling`)
 - Criar use case em `src/use-cases/{kebab-action}.ts`
 - Criar factory em `src/use-cases/factories/`
 
@@ -42,9 +42,9 @@ Para cada ação (create, get, list, update, delete):
 ### 5. Routes (uma por ação)
 
 Para cada ação:
-- Criar route handler em `src/http/controllers/{domain}/` **sem `try/catch` de domain error**
-- Criar/atualizar routes barrel
-- Criar E2E test
+- Criar route handler em `src/http/routes/{entity}/{action}.route.ts` **sem `try/catch` de domain error**
+- Criar/atualizar barrel `src/http/routes/{entity}/index.ts`
+- Criar E2E test em `src/http/routes/{entity}/{action}.route.spec.ts` (co-located)
 
 ### 6. Registrar erros e rotas no app
 
@@ -68,7 +68,9 @@ Quando o usuário pedir CRUD, gerar estas 5 ações:
 | Ação | Use Case | Method | Path | Status |
 |------|----------|--------|------|--------|
 | Create | `Create{Entity}` | POST | `/{entities}` | 201 |
+| List | `List{Entity}s` | GET | `/{entities}` | 200 |
 | Get by ID | `Get{Entity}ById` | GET | `/{entities}/:id` | 200 |
-| List | `Fetch{Entity}s` | GET | `/{entities}` | 200 |
-| Update | `Update{Entity}` | PUT | `/{entities}/:id` | 200 |
+| Update | `Update{Entity}` | PATCH | `/{entities}/:id` | 200 |
 | Delete | `Delete{Entity}` | DELETE | `/{entities}/:id` | 204 |
+
+Update usa **PATCH com body parcial** (todos os campos opcionais).

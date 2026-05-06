@@ -6,7 +6,7 @@ description: "Convenções de Elysia: plugin pattern, route handlers, error mapp
 
 ## Plugin pattern
 
-Cada rota é uma instância `new Elysia()` independente:
+Cada rota é uma instância `new Elysia()` independente em `src/http/routes/{entity}/{action}.route.ts`:
 
 ```typescript
 import Elysia from 'elysia'
@@ -45,26 +45,39 @@ Domain errors são tratados pelo `errorHandlerPlugin` central — rotas não usa
 
 ## Routes barrel
 
+Cada entidade exporta um barrel em `src/http/routes/{entity}/index.ts`:
+
 ```typescript
 import Elysia from 'elysia'
-import { createProductRoute } from './create-product'
-import { getProductRoute } from './get-product'
+import { createProductRoute } from './create-product.route'
+import { getProductByIdRoute } from './get-product-by-id.route'
 
-export const productsRoutes = new Elysia({ prefix: '/products' })
+export const productsRoutes = new Elysia()
   .use(createProductRoute)
-  .use(getProductRoute)
+  .use(getProductByIdRoute)
+```
+
+Registrar em `src/index.ts`:
+
+```typescript
+app
+  .use(errorHandlerPlugin)
+  .use(productsRoutes)
 ```
 
 ## Regras
 
 - Cada rota exporta um `new Elysia()` (composável, independente, testável)
+- Arquivo de rota termina em `.route.ts` (`create-product.route.ts`)
+- Arquivo de E2E test termina em `.route.spec.ts` (`create-product.route.spec.ts`)
+- Barrel da entidade em `index.ts` (não `routes.ts`)
 - Zod schemas definidos **inline** no objeto de opções da rota, não importados de fora
 - `import z from 'zod'` (default import, Zod v4)
 - **Não capturar domain errors em rota** — `errorHandlerPlugin` central mapeia (ver `error-handling.md`)
-- Routes barrel usa `new Elysia({ prefix: '/{domain}' })`
-- Routes registradas em `src/index.ts` via `.use(domainRoutes)`
+- Routes registradas em `src/index.ts` via `.use({entity}Routes)`
 - Route handler chama a **factory**, nunca instancia repos diretamente
 - Route handler nunca importa `db`
+- Path do route handler é o path completo (`'/products'`, `'/products/:id'`) — sem prefix no barrel
 
 ## Error → Status code
 
@@ -92,3 +105,15 @@ Toda rota deve ter `detail` com `summary` e `tags`. Tags agrupam por domínio (P
   },
 }
 ```
+
+## CRUD HTTP methods padrão
+
+| Ação | Method | Status sucesso |
+|------|--------|----------------|
+| Create | POST | 201 |
+| List | GET | 200 |
+| Get by ID | GET | 200 |
+| Update (parcial) | PATCH | 200 |
+| Delete | DELETE | 204 |
+
+Update usa **PATCH** — body com todos os campos opcionais. PUT só se a semântica for "substituição completa" (raro).
